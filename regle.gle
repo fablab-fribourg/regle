@@ -1,0 +1,90 @@
+! FabLab ruler
+
+width  = 32
+title$ = """""La culture c'est la règle, l'art c'est l'exception"""" // Jean-Luc Godard"
+metric_size = int(width-1)
+imperial_size = int(metric_size/2.54)
+
+height =  3.5
+
+handle_hole = 4
+cardboard_width = 0.4
+$cuts = 0
+
+h10 = 0.5
+h5  = 0.4
+h1  = 0.3
+to  = 0.65 ! text offset
+
+size width height
+
+sub ruler xsize factor
+	begin origin
+		local i, j
+		! unit marks and labels
+		for i = 0 to xsize
+			set color rgb(100,0,0)
+			amove i*factor 0
+			rline 0 h10
+			set color rgb(0,0,0)
+			amove i*factor to
+			write i  
+		next i
+
+		for i = 0 to xsize-1
+		  set color rgb(100,0,0)
+		  ! half unit
+		  amove (0.5+i)*factor 0
+		  rline 0 h5
+		  ! 10th of unit
+		  for j = 1 to 4 step 1
+			amove (0.5+i-(j/10))*factor 0
+			rline 0 h1
+			amove (0.5+i+(j/10))*factor 0
+			rline 0 h1
+		  next j
+		next i
+
+	end origin
+end sub
+
+sub metric_ruler xsize
+	ruler xsize 1
+end sub
+
+sub imperial_ruler xsize
+	ruler xsize 2.54
+end sub
+
+
+set justify center
+set font texcmssb
+set hei 0.7
+amove width/2 height/2-0.7*0.25
+write title$
+
+set font plsr
+
+set hei 0.45
+amove (width-metric_size)/2 0
+metric_ruler metric_size
+
+amove 0 0
+begin rotate 180
+	amove -width+(width-imperial_size*2.54)/2 -height
+	imperial_ruler imperial_size
+end rotate
+
+set color rgb(0,0,100)
+
+$cut_offset=(width-$cuts*handle_hole)/($cuts+1)
+for i=1 to $cuts
+	amove i*$cut_offset+(i-1)*handle_hole height/2-cardboard_width/2
+	box handle_hole cardboard_width
+next i
+
+! last operation, cut the ruler
+amove 0 0
+box width height round 0.2
+
+
